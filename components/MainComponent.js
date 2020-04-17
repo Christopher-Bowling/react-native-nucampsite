@@ -3,7 +3,8 @@ import { View, StyleSheet, Platform } from 'react-native';
 
 import Directory from './DirectoryComponent';
 import CampsiteInfo from './CampsiteInfoComponent';
-import { createStackNavigator } from 'react-navigation';
+import Home from './HomeComponent';
+import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 
 const DirectoryNavigator = createStackNavigator(
   {
@@ -24,11 +25,38 @@ const DirectoryNavigator = createStackNavigator(
   }
 );
 
+const HomeNavigator = createStackNavigator(
+  {
+    Home: { screen: Home}
+  },
+  {
+    navigationOptions: {
+      headerStyle: {
+        backgroundColor: '#5637DD',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        color: '#fff',
+      },
+    },
+  }
+)
+
+const MainNavigator = createDrawerNavigator(
+  {
+    Home: { screen: HomeNavigator },
+    Directory: { screen: DirectoryNavigator }
+  },
+  {
+    drawerBackgroundColor: '#CEC8FF'
+  }
+)
+
 class Main extends Component {
   render() {
     return (
       <View style={styles.mainContainer}>
-        <DirectoryNavigator />
+        <MainNavigator />
       </View>
     );
   }
