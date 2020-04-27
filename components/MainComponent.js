@@ -13,6 +13,8 @@ import CampsiteInfo from './CampsiteInfoComponent';
 import Home from './HomeComponent';
 import About from './AboutComponent';
 import Contact from './ContactComponent';
+import Reservation from './ReservationComponent';
+
 import {
   createStackNavigator,
   createDrawerNavigator,
@@ -20,6 +22,21 @@ import {
 } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import SafeAreaView from 'react-native-safe-area-view';
+import { connect } from 'react-redux';
+import {
+  fetchCampsites,
+  fetchComments,
+  fetchPromotions,
+  fetchPartners,
+} from '../redux/ActionCreators';
+import { baseUrl } from '../shared/baseUrl';
+
+const mapDispatchToProps = {
+  fetchCampsites,
+  fetchComments,
+  fetchPromotions,
+  fetchPartners,
+};
 
 const DirectoryNavigator = createStackNavigator(
   {
@@ -127,6 +144,31 @@ const ContactNavigator = createStackNavigator(
   }
 );
 
+const ReservationNavigator = createStackNavigator(
+  {
+    Reservation: { screen: Reservation },
+  },
+  {
+    navigationOptions: ({ navigation }) => ({
+      headerStyle: {
+        backgroundColor: '#5637DD',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        color: '#fff',
+      },
+      headerLeft: (
+        <Icon
+          name='tree'
+          type='font-awesome'
+          iconStyle={styles.stackIcon}
+          onPress={() => navigation.toggleDrawer()}
+        />
+      ),
+    }),
+  }
+);
+
 const CustomDrawerContentComponent = (props) => (
   <ScrollView>
     <SafeAreaView
@@ -167,6 +209,15 @@ const MainNavigator = createDrawerNavigator(
         ),
       },
     },
+    Reservation: {
+      screen: ReservationNavigator,
+      navigationOptions: {
+        drawerLabel: 'Reserve Campsite',
+        drawerIcon: ({ tintColor }) => (
+          <Icon name='tree' type='font-awesome' size={24} color={tintColor} />
+        ),
+      },
+    },
     About: {
       screen: AboutNavigator,
       navigationOptions: {
@@ -198,11 +249,18 @@ const MainNavigator = createDrawerNavigator(
   },
   {
     drawerBackgroundColor: '#CEC8FF',
-    contentComponent: CustomDrawerContentComponent
+    contentComponent: CustomDrawerContentComponent,
   }
 );
 
 class Main extends Component {
+  componentDidMount() {
+    this.props.fetchCampsites();
+    this.props.fetchComments();
+    this.props.fetchPromotions();
+    this.props.fetchPartners();
+  }
+
   render() {
     return (
       <View style={styles.mainContainer}>
@@ -214,7 +272,7 @@ class Main extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   drawerHeader: {
     backgroundColor: '#5637DD',
@@ -222,18 +280,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
-    flexDirection: 'row'
-},
-drawerHeaderText: {
+    flexDirection: 'row',
+  },
+  drawerHeaderText: {
     color: '#fff',
     fontSize: 24,
-    fontWeight: 'bold'
-},
-drawerImage: {
+    fontWeight: 'bold',
+  },
+  drawerImage: {
     margin: 10,
     height: 60,
-    width: 60
-},
+    width: 60,
+  },
   mainContainer: {
     flex: 1,
     paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight,
@@ -245,4 +303,4 @@ drawerImage: {
   },
 });
 
-export default Main;
+export default connect(null, mapDispatchToProps)(Main);
